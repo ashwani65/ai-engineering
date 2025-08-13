@@ -120,6 +120,7 @@
                 <a href="#deploying" class="nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
                 <a href="#ops" class="nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
                 <a href="#safety" class="nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+                <a href="#mindmap" class="nav-link font-medium text-gray-600 hover:text-gray-900">Mind Map</a>
             </div>
             <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -134,6 +135,7 @@
             <a href="#deploying" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
             <a href="#ops" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
             <a href="#safety" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+            <a href="#mindmap" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Mind Map</a>
         </div>
     </header>
 
@@ -143,6 +145,16 @@
         <section class="text-center mb-20">
             <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">From Foundations to Deployment</h2>
             <p class="text-lg text-gray-600 max-w-3xl mx-auto">An interactive journey through the core concepts, architectures, and practical applications of modern AI engineering. Explore the building blocks of systems like GPT and learn how to create your own intelligent applications.</p>
+        </section>
+
+        <!-- Mind Map Section -->
+        <section id="mindmap" class="mb-20 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Mind Map: AI Engineering Landscape</h3>
+            <p class="text-gray-600 mb-6 max-w-4xl">Explore the high-level overview derived from your NotebookLM map. Click the image to view full-screen.</p>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <img id="mindmap-img" src="./NotebookLM%20Mind%20Map%20(1).png" alt="AI Engineering Mind Map" class="w-full rounded-md cursor-zoom-in" />
+                <p class="text-sm text-gray-500 mt-2">Source: `NotebookLM Mind Map (1).png`</p>
+            </div>
         </section>
 
         <!-- Foundations Section -->
@@ -162,6 +174,33 @@
                 <div class="card bg-white p-6 rounded-lg shadow-sm">
                     <h4 class="font-bold text-xl mb-2 text-gray-800">Embeddings & Positional Encoding</h4>
                     <p class="text-gray-600">Tokens are mapped to high-dimensional vectors (embeddings) that capture semantic meaning. A positional encoding is added to give the model a sense of sequence order.</p>
+                </div>
+            </div>
+
+            <div class="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card bg-white p-6 rounded-lg shadow-sm">
+                    <h4 class="font-bold text-xl mb-2 text-gray-800">AI Engineering Overview</h4>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Build generative AI systems end-to-end</li>
+                        <li>Scale with data, infra, and evaluation</li>
+                        <li>Interdisciplinary: AI, data, product, UX</li>
+                    </ul>
+                </div>
+                <div class="card bg-white p-6 rounded-lg shadow-sm">
+                    <h4 class="font-bold text-xl mb-2 text-gray-800">Understanding Foundation Models</h4>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Evolution from LLMs to multimodal FM</li>
+                        <li>General-purpose capabilities via pretraining</li>
+                        <li>Adaptation with prompting and fine-tuning</li>
+                    </ul>
+                </div>
+                <div class="card bg-white p-6 rounded-lg shadow-sm">
+                    <h4 class="font-bold text-xl mb-2 text-gray-800">Probabilistic Nature of AI</h4>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Sampling process drives variability</li>
+                        <li>Open-ended outputs: creativity & hallucination</li>
+                        <li>Control via temperature, top-k, nucleus</li>
+                    </ul>
                 </div>
             </div>
 
@@ -243,6 +282,30 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Sampling & Prompting Details -->
+            <div class="grid md:grid-cols-2 gap-8 mt-12">
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4">Sampling Strategies</h4>
+                    <ul class="space-y-2 text-gray-600 text-sm">
+                        <li><strong class="text-gray-700">Greedy / Logits:</strong> Deterministic best-token decoding; low diversity.</li>
+                        <li><strong class="text-gray-700">Temperature:</strong> Scales logits; lower is more deterministic.</li>
+                        <li><strong class="text-gray-700">Top-k / Top-p:</strong> Limit candidate set by count or cumulative mass.</li>
+                        <li><strong class="text-gray-700">Beam search:</strong> Multiple hypotheses; costly and less used for open text.</li>
+                        <li><strong class="text-gray-700">Constrained / JSON mode:</strong> Enforce schema for structured outputs.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4">Prompt Engineering</h4>
+                    <ul class="space-y-2 text-gray-600 text-sm">
+                        <li><strong class="text-gray-700">Clarity:</strong> Roles, goals, constraints, and examples.</li>
+                        <li><strong class="text-gray-700">Context:</strong> Provide retrieved snippets and metadata.</li>
+                        <li><strong class="text-gray-700">Defensive:</strong> Refusal guidance, jailbreak-resistant patterns.</li>
+                        <li><strong class="text-gray-700">Tool-first:</strong> Encourage calling functions with schemas.</li>
+                        <li><strong class="text-gray-700">Chain-of-thought (hidden):</strong> Use internal reasoning, keep summaries external.</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -346,6 +409,37 @@
                     </table>
                 </div>
             </div>
+
+            <!-- AI Agents Details -->
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">AI Agents</h4>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Components</h5>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li>Planner</li>
+                            <li>Tools & Environment</li>
+                            <li>Memory & State</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Planning & Tool Use</h5>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li>Decompose tasks to toolable steps</li>
+                            <li>Validate preconditions and outputs</li>
+                            <li>Fallback paths and retries</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Memory Systems</h5>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li>Short-term: chat window/context</li>
+                            <li>Long-term: vector store/user profile</li>
+                            <li>Episodic/task memory: artifacts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Optimizing Section -->
@@ -404,6 +498,26 @@
                     <div class="chart-container mt-6">
                         <canvas id="quantChart"></canvas>
                     </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 mt-12">
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Advanced Fine-Tuning & Data</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><strong class="text-gray-700">PEFT techniques:</strong> LoRA, QLoRA, adapters for efficiency.</li>
+                        <li><strong class="text-gray-700">Model merging:</strong> Blend specialist checkpoints carefully.</li>
+                        <li><strong class="text-gray-700">Curation:</strong> High-quality instruction/preference pairs.</li>
+                        <li><strong class="text-gray-700">Synthesis:</strong> Generate data with guardrails and review.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Inference Optimization</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><strong class="text-gray-700">Metrics:</strong> Latency (p50/p95), throughput, cost.</li>
+                        <li><strong class="text-gray-700">Compression:</strong> Quantization, pruning, KV cache reuse.</li>
+                        <li><strong class="text-gray-700">Service level:</strong> Batching, streaming, autoscaling.</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -473,6 +587,14 @@
                         <li>Retries with backoff and idempotency keys</li>
                         <li>Circuit breaking on upstream errors</li>
                         <li>Chaos testing for tool failures</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md md:col-span-3">
+                    <h4 class="font-bold text-lg mb-2 text-gray-800">User Feedback Loop</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Collect thumbs up/down and free-form feedback</li>
+                        <li>Capture input, retrieval context, and tool traces</li>
+                        <li>Triage to datasets for supervised or preference tuning</li>
                     </ul>
                 </div>
             </div>
@@ -547,6 +669,28 @@
 
             window.addEventListener('scroll', onScroll);
             onScroll(); // Run on load
+
+            // Mind Map Modal
+            const mindmapImg = document.getElementById('mindmap-img');
+            const modalHtml = `
+                <div id="image-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+                    <div class="relative max-w-5xl w-11/12">
+                        <button id="image-modal-close" class="absolute -top-10 right-0 text-white text-2xl">✕</button>
+                        <img src="./NotebookLM%20Mind%20Map%20(1).png" alt="AI Engineering Mind Map Full" class="w-full rounded" />
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const imageModal = document.getElementById('image-modal');
+            const imageModalClose = document.getElementById('image-modal-close');
+            if (mindmapImg) {
+                mindmapImg.addEventListener('click', () => {
+                    imageModal.classList.remove('hidden');
+                });
+            }
+            imageModal.addEventListener('click', (e) => {
+                if (e.target === imageModal) imageModal.classList.add('hidden');
+            });
+            imageModalClose.addEventListener('click', () => imageModal.classList.add('hidden'));
 
             // QKV Diagram Interaction
             const qkvData = {
