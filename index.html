@@ -116,6 +116,8 @@
                 <a href="#architecting" class="nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
                 <a href="#optimizing" class="nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
                 <a href="#deploying" class="nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+                <a href="#ops" class="nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+                <a href="#safety" class="nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
             </div>
             <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -128,6 +130,8 @@
             <a href="#architecting" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
             <a href="#optimizing" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
             <a href="#deploying" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+            <a href="#ops" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+            <a href="#safety" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
         </div>
     </header>
 
@@ -213,6 +217,31 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Structured Outputs Panel -->
+                <div class="mt-8 bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Structured Outputs: JSON and Schemas</h4>
+                    <p class="text-center text-gray-600 mb-8">Modern models support constrained generation for predictable outputs. Prefer JSON mode and function/tool schemas to reduce parsing errors and improve reliability.</p>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="p-4 rounded-lg bg-gray-50">
+                            <h5 class="font-semibold mb-2">JSON Mode</h5>
+                            <p class="text-sm text-gray-600">Ask the model to return strict JSON. Validate and reject malformed responses; retry with a shorter context if needed.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50">
+                            <h5 class="font-semibold mb-2">Function Schemas</h5>
+                            <p class="text-sm text-gray-600">Define `tools` with JSON Schema. Models select a function and emit typed arguments, lowering post-processing complexity.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50">
+                            <h5 class="font-semibold mb-2">Schema Tips</h5>
+                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                                <li>Mark required fields in `required`</li>
+                                <li>Use enums for finite choices</li>
+                                <li>Bound numbers with `minimum`/`maximum`</li>
+                                <li>Prefer small, composable functions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -244,6 +273,37 @@
                 <div id="rag-explanation" class="mt-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-400 hidden">
                     <h5 id="rag-explanation-title" class="font-bold text-xl mb-2"></h5>
                     <p id="rag-explanation-text"></p>
+                </div>
+            </div>
+            
+            <!-- RAG Best Practices -->
+            <div class="bg-white p-8 rounded-lg shadow-md mb-12">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">RAG Best Practices</h4>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Chunking</h5>
+                        <p class="text-sm text-gray-600">Use semantic or heading-aware chunking with modest overlap (e.g., 128–256 tokens) to preserve coherence without duplication.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Hybrid Search</h5>
+                        <p class="text-sm text-gray-600">Combine dense vectors with keyword/BM25 to capture exact terms, numbers, and symbols.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Reranking</h5>
+                        <p class="text-sm text-gray-600">Apply cross-encoder rerankers on top-K candidates to improve precision while keeping latency manageable.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Filters & Metadata</h5>
+                        <p class="text-sm text-gray-600">Index rich metadata (source, section, date) and filter by scope/time to reduce noise.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Citations</h5>
+                        <p class="text-sm text-gray-600">Return source URLs/IDs with spans. Encourage grounded answers and enable auditability.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-50">
+                        <h5 class="font-semibold mb-2">Evaluation</h5>
+                        <p class="text-sm text-gray-600">Measure retrieval precision/recall, answer faithfulness, and context sensitivity on a task-specific test set.</p>
+                    </div>
                 </div>
             </div>
 
@@ -322,6 +382,28 @@
                     </ul>
                 </div>
             </div>
+
+            <div class="grid md:grid-cols-2 gap-12 mt-12">
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Preference Optimization</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><strong class="text-gray-700">RLHF:</strong> Policy optimized with a reward model; high quality but complex.</li>
+                        <li><strong class="text-gray-700">DPO/ORPO:</strong> Direct optimization from preference pairs; simpler training, strong results.</li>
+                        <li><strong class="text-gray-700">Self-Play/Constitutional:</strong> Model critiques and revises outputs using principles to reduce human labeling.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Latency & Cost Optimizations</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><strong class="text-gray-700">Speculative Decoding:</strong> Draft model proposes tokens; larger model verifies for speedups.</li>
+                        <li><strong class="text-gray-700">Caching:</strong> Reuse embeddings, retrieval results, and prompt prefixes; apply ETags for HTTP resources.</li>
+                        <li><strong class="text-gray-700">Distillation:</strong> Train smaller student models for inference while preserving quality.</li>
+                    </ul>
+                    <div class="chart-container mt-6">
+                        <canvas id="quantChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Deploying Section -->
@@ -358,6 +440,62 @@
                         <h5 class="font-semibold">Go Live!</h5>
                         <p class="text-sm text-gray-500">Your app is automatically deployed.</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ops Section -->
+        <section id="ops" class="mb-20 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Production Ops</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">Operational excellence keeps LLM systems reliable and affordable. Track quality, cost, and safety with rigorous monitoring.</p>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2 text-gray-800">Observability</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Structured logs with request IDs</li>
+                        <li>Traces across retrieval, tools, and model calls</li>
+                        <li>Prompt/version tracking</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2 text-gray-800">Cost Control</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Token and tool budgets per request</li>
+                        <li>Early exit and truncation policies</li>
+                        <li>Autoscaling and request batching</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2 text-gray-800">Reliability</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Retries with backoff and idempotency keys</li>
+                        <li>Circuit breaking on upstream errors</li>
+                        <li>Chaos testing for tool failures</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Section -->
+        <section id="safety" class="mb-16 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Safety & Governance</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">Bake-in safeguards and continuous evaluation to mitigate risks while maintaining utility.</p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2 text-gray-800">Runtime Controls</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Input/output filters and PII redaction</li>
+                        <li>Tool allowlists and rate limits</li>
+                        <li>Safety classifiers with blocklists and context-aware rules</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg mb-2 text-gray-800">Red Teaming & Audits</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Adversarial prompts and jailbreak testing</li>
+                        <li>Dataset audits for bias and leakage</li>
+                        <li>Post-incident reviews and action tracking</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -496,7 +634,7 @@
                     labels: ['Full Fine-Tuning', 'LoRA (PEFT)'],
                     datasets: [{
                         label: 'Trainable Parameters',
-                        data: [7000, 4.7], // Data in Millions (e.g., 7B model)
+                        data: [7000, 5], // Millions; illustrative for a 7B base
                         backgroundColor: [
                             'rgba(239, 68, 68, 0.6)', // Red-ish for high cost
                             'rgba(34, 197, 94, 0.6)'  // Green for efficient
@@ -542,6 +680,48 @@
                     }
                 }
             });
+
+            // Quantization/Latency Chart
+            const quantCtx = document.getElementById('quantChart')?.getContext('2d');
+            if (quantCtx) {
+                new Chart(quantCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['FP16', 'INT8', 'INT4'],
+                        datasets: [{
+                            label: 'Relative Latency (↓ better)',
+                            data: [1.0, 0.65, 0.45],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.6)',
+                                'rgba(59, 130, 246, 0.6)',
+                                'rgba(59, 130, 246, 0.6)'
+                            ],
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Relative Latency' }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'x' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>
