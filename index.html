@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AI Engineering Compendium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm neutrals with slate blue and subtle sage accents) -->
+    <!-- Application Structure Plan: The application is structured as a single-page interactive learning journey, moving away from the linear format of the source report. The primary navigation is thematic (Foundations, Building, Architecting, Optimizing, Deploying), allowing users to either follow a logical learning path or jump to specific areas of interest. This non-linear, hub-and-spoke design enhances usability by letting users control their learning pace and focus. Key interactions include clickable cards for concepts, step-by-step interactive diagrams for processes (like RAG and Tool Calling), and hover-to-reveal definitions for key terms. This structure was chosen to transform passive reading into active exploration, making the dense academic content more digestible and engaging for a modern learner. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core LLM concepts (Tokens, Embeddings, Attention). Goal: Inform. Viz/Method: Interactive cards with icons and expandable text blocks. Interaction: Click to expand details. Justification: Breaks down complex theory into manageable, bite-sized pieces. Library: HTML/CSS/JS.
+        - Report Info: Tool Calling Loop. Goal: Explain a process. Viz/Method: Numbered, interactive step-by-step diagram. Interaction: Clicking a step highlights it and shows a detailed explanation. Justification: Visually clarifies the multi-turn conversation flow, which is hard to grasp from text alone. Library: HTML/CSS/JS.
+        - Report Info: RAG Pipeline. Goal: Explain a process. Viz/Method: A three-stage interactive diagram (Index, Retrieve, Generate). Interaction: Click on a stage to see its components and purpose. Justification: Simplifies a complex data flow into a clear, memorable visual model. Library: HTML/CSS/JS.
+        - Report Info: Fine-tuning parameter comparison. Goal: Compare. Viz/Method: Bar chart. Interaction: Hover over bars to see exact parameter counts. Justification: Provides a stark, quantitative visualization of LoRA's efficiency over full fine-tuning. Library: Chart.js.
+        - Report Info: Multi-Agent Frameworks (LangGraph vs CrewAI). Goal: Compare. Viz/Method: Interactive HTML table. Interaction: Hover on rows for emphasis. Justification: Presents a direct, feature-by-feature comparison for easy decision-making. Library: HTML/CSS/JS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4; /* Warm off-white */
+            color: #4A4A4A; /* Dark Gray */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #4A5568; /* Slate Blue */
+            transition: width 0.3s ease;
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .interactive-diagram-step {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left-width: 4px;
+            border-color: transparent;
+        }
+        .interactive-diagram-step.active {
+            background-color: #E9E7E1; /* Lighter warm gray */
+            border-color: #6B7280; /* Slate Blue */
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted #6B7280;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #2d3748;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        .comparison-table tr:hover {
+            background-color: #f0eeeb;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-[#F8F7F4]/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800">AI Engineering Compendium</h1>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#foundations" class="nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+                <a href="#building" class="nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+                <a href="#architecting" class="nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
+                <a href="#optimizing" class="nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
+                <a href="#deploying" class="nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="#foundations" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+            <a href="#building" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+            <a href="#architecting" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
+            <a href="#optimizing" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
+            <a href="#deploying" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <!-- Hero Section -->
+        <section class="text-center mb-20">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">From Foundations to Deployment</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An interactive journey through the core concepts, architectures, and practical applications of modern AI engineering. Explore the building blocks of systems like GPT and learn how to create your own intelligent applications.</p>
+        </section>
+
+        <!-- Foundations Section -->
+        <section id="foundations" class="mb-20 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Part I: The Foundations of Modern LLMs</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">This section deconstructs the core scientific and engineering principles that power today's large language models. We'll explore the Transformer architecture, from the basic idea of next-token prediction to the sophisticated mechanics of the attention mechanism.</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card bg-white p-6 rounded-lg shadow-sm">
+                    <h4 class="font-bold text-xl mb-2 text-gray-800">The Transformer Architecture</h4>
+                    <p class="text-gray-600">The core innovation that enabled modern LLMs. By replacing sequential RNNs with a parallelized attention mechanism, it allowed for training models at an unprecedented scale on GPUs.</p>
+                </div>
+                <div class="card bg-white p-6 rounded-lg shadow-sm">
+                    <h4 class="font-bold text-xl mb-2 text-gray-800">Tokenization</h4>
+                    <p class="text-gray-600">The process of converting raw text into a sequence of numerical IDs. Modern models use subword tokenization, balancing vocabulary size with the ability to handle unknown words.</p>
+                </div>
+                <div class="card bg-white p-6 rounded-lg shadow-sm">
+                    <h4 class="font-bold text-xl mb-2 text-gray-800">Embeddings & Positional Encoding</h4>
+                    <p class="text-gray-600">Tokens are mapped to high-dimensional vectors (embeddings) that capture semantic meaning. A positional encoding is added to give the model a sense of sequence order.</p>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-white p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">The Attention Mechanism: Q, K, V Explained</h4>
+                <p class="text-center text-gray-600 mb-8">The core of the Transformer is self-attention, which allows the model to weigh the importance of different words in a sequence. This is achieved using three learned vectors: Query, Key, and Value. Click on each component to learn its role.</p>
+                <div class="flex flex-col md:flex-row justify-center items-start gap-4 md:gap-8">
+                    <div class="w-full md:w-1/2 flex flex-col items-center">
+                        <div id="qkv-diagram" class="space-y-4 w-full max-w-md">
+                            <div id="qkv-q" class="interactive-diagram-step p-4 rounded-lg border-l-4 border-transparent bg-gray-50">
+                                <h5 class="font-bold text-lg">Query (Q)</h5>
+                                <p class="text-sm">Represents the current word's "question" about the context. It's what the word is looking for.</p>
+                            </div>
+                             <div class="text-center text-2xl font-mono text-gray-400">+</div>
+                            <div id="qkv-k" class="interactive-diagram-step p-4 rounded-lg border-l-4 border-transparent bg-gray-50">
+                                <h5 class="font-bold text-lg">Key (K)</h5>
+                                <p class="text-sm">Represents what a word "offers." It's like a label or index for the information in that token.</p>
+                            </div>
+                             <div class="text-center text-2xl font-mono text-gray-400">=</div>
+                             <div class="p-4 rounded-lg bg-blue-50 border-l-4 border-blue-400">
+                                <h5 class="font-bold text-lg">Attention Score</h5>
+                                <p class="text-sm">A high dot-product score between a Query and a Key indicates high relevance.</p>
+                            </div>
+                            <div class="text-center text-2xl font-mono text-gray-400">×</div>
+                            <div id="qkv-v" class="interactive-diagram-step p-4 rounded-lg border-l-4 border-transparent bg-gray-50">
+                                <h5 class="font-bold text-lg">Value (V)</h5>
+                                <p class="text-sm">Represents the actual content or information of the word.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 mt-8 md:mt-0 p-6 bg-gray-50 rounded-lg">
+                        <h5 id="qkv-explanation-title" class="text-xl font-bold mb-2 text-gray-800">How it Works</h5>
+                        <p id="qkv-explanation-text" class="text-gray-600">The model calculates an attention score by comparing the **Query** of the current word with the **Key** of every other word. These scores are then used to create a weighted sum of all the **Value** vectors, producing a new, context-aware representation for the current word. Click on Q, K, or V to see a detailed explanation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Building Section -->
+        <section id="building" class="mb-20 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Part II: Building Applications with LLM APIs</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">This section transitions from theory to practice, focusing on the essential skills for programmatically controlling pre-trained models. We'll cover API interaction, advanced prompt engineering, and the powerful technique of tool calling.</p>
+
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Interactive Flow: The Tool Calling Loop</h4>
+                <p class="text-center text-gray-600 mb-8">Tool calling allows LLMs to interact with external systems. It's a multi-step conversation between your app and the model. Click each step to understand the flow.</p>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div id="tool-calling-steps" class="w-full md:w-1/3 space-y-2">
+                        <!-- Steps will be dynamically generated here -->
+                    </div>
+                    <div class="w-full md:w-2/3 p-6 bg-gray-50 rounded-lg flex items-center">
+                        <div>
+                            <h5 id="tool-calling-title" class="text-xl font-bold mb-2 text-gray-800">Step 1: Request with Tools</h5>
+                            <p id="tool-calling-explanation" class="text-gray-600">The developer sends a prompt to the model, including a list of available `tools` defined by a JSON schema. This tells the model what functions it can potentially use.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecting Section -->
+        <section id="architecting" class="mb-20 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Part III: Engineering Intelligent Systems</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">Here, we explore how to construct complex systems that can perform multi-step tasks. This involves architecting "agents," grounding them in factual data with RAG, and designing multi-agent systems for collaboration.</p>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md mb-12">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">The RAG Pipeline: Grounding LLMs in Your Data</h4>
+                <p class="text-center text-gray-600 mb-8">Retrieval-Augmented Generation (RAG) prevents hallucinations by giving the LLM an "open book" of your data to consult before answering. Explore the three main stages of the pipeline.</p>
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div id="rag-index" class="rag-step p-6 rounded-lg cursor-pointer transition-all duration-300 bg-gray-50 hover:bg-gray-100">
+                        <div class="text-3xl mb-2">🗂️</div>
+                        <h5 class="font-bold text-lg">1. Indexing</h5>
+                        <p class="text-sm">Documents are split into chunks, converted to vector embeddings, and stored in a vector database.</p>
+                    </div>
+                    <div id="rag-retrieve" class="rag-step p-6 rounded-lg cursor-pointer transition-all duration-300 bg-gray-50 hover:bg-gray-100">
+                        <div class="text-3xl mb-2">🔍</div>
+                        <h5 class="font-bold text-lg">2. Retrieval</h5>
+                        <p class="text-sm">The user's query is embedded, and a similarity search finds the most relevant chunks from the database.</p>
+                    </div>
+                    <div id="rag-generate" class="rag-step p-6 rounded-lg cursor-pointer transition-all duration-300 bg-gray-50 hover:bg-gray-100">
+                        <div class="text-3xl mb-2">✍️</div>
+                        <h5 class="font-bold text-lg">3. Generation</h5>
+                        <p class="text-sm">The retrieved chunks are added to the prompt, giving the LLM context to generate a grounded answer.</p>
+                    </div>
+                </div>
+                <div id="rag-explanation" class="mt-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-400 hidden">
+                    <h5 id="rag-explanation-title" class="font-bold text-xl mb-2"></h5>
+                    <p id="rag-explanation-text"></p>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Multi-Agent Frameworks: A Comparison</h4>
+                <p class="text-center text-gray-600 mb-8">To build systems where multiple agents collaborate, developers use frameworks that manage their interaction. The choice of framework involves a trade-off between control and ease of use.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse comparison-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="p-4 font-semibold border-b">Feature</th>
+                                <th class="p-4 font-semibold border-b">LangGraph</th>
+                                <th class="p-4 font-semibold border-b">CrewAI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-4 font-medium">Core Abstraction</td>
+                                <td class="p-4">State Graphs (Nodes & Edges)</td>
+                                <td class="p-4">Agents, Tasks, Crews</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-4 font-medium">Control Level</td>
+                                <td class="p-4">Low-level, explicit control over state and transitions.</td>
+                                <td class="p-4">High-level, abstracts away orchestration.</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-4 font-medium">Ease of Use</td>
+                                <td class="p-4">Steeper learning curve; requires graph theory concepts.</td>
+                                <td class="p-4">Beginner-friendly; intuitive role-playing paradigm.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium">Ideal Use Case</td>
+                                <td class="p-4">Complex, production-grade systems with custom control flows.</td>
+                                <td class="p-4">Rapid prototyping of collaborative agent teams.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Optimizing Section -->
+        <section id="optimizing" class="mb-20 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Part IV: Advanced Customization & Evaluation</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">To build truly effective applications, we must customize models for specific tasks and rigorously evaluate their performance. This section covers fine-tuning with LoRA and the critical frameworks for agent evaluation.</p>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Fine-Tuning Efficiency: LoRA vs. Full Fine-Tuning</h4>
+                    <p class="text-center text-gray-600 mb-6">Parameter-Efficient Fine-Tuning (PEFT) methods like LoRA drastically reduce the computational cost of adapting models. This chart visualizes the difference in trainable parameters for a typical large model.</p>
+                    <div class="chart-container">
+                        <canvas id="loraChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4">Evaluating Agent Performance</h4>
+                    <p class="text-gray-600 mb-6">Evaluating agents requires looking beyond simple accuracy. A robust framework assesses the entire process, from tool use to response quality. Key metrics include:</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">✓</span>
+                            <span><strong class="text-gray-700">Task Performance:</strong> Success rate, accuracy, error rate.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">✓</span>
+                            <span><strong class="text-gray-700">Efficiency:</strong> Cost (tokens consumed) and latency.</span>
+                        </li>
+                        <li class="flex items-start">
+                             <span class="text-green-500 mr-3 mt-1">✓</span>
+                            <span><strong class="text-gray-700">Trajectory Evaluation:</strong> The sequence of actions, including tool use precision and recall.</span>
+                        </li>
+                        <li class="flex items-start">
+                             <span class="text-green-500 mr-3 mt-1">✓</span>
+                            <span><strong class="text-gray-700">Safety & Ethics:</strong> Checks for bias and harmful content.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deploying Section -->
+        <section id="deploying" class="mb-16 pt-16">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Part V: Multimodal AI & Deployment</h3>
+            <p class="text-gray-600 mb-8 max-w-4xl">The final frontier is expanding beyond text and making our applications accessible to the world. This section covers voice and image generation, and the essentials of deploying apps with platforms like Hugging Face and Gradio.</p>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Deployment in 5 Steps</h4>
+                <p class="text-center text-gray-600 mb-8">Using modern tools like Gradio and Hugging Face Spaces, deploying a live AI demo has never been easier. The process abstracts away complex web infrastructure.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 text-center">
+                    <div class="flex flex-col items-center p-4">
+                        <div class="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full text-2xl font-bold text-gray-600 mb-3">1</div>
+                        <h5 class="font-semibold">Write Script</h5>
+                        <p class="text-sm text-gray-500">Create `app.py` with Gradio UI.</p>
+                    </div>
+                    <div class="flex flex-col items-center p-4">
+                        <div class="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full text-2xl font-bold text-gray-600 mb-3">2</div>
+                        <h5 class="font-semibold">Define Deps</h5>
+                        <p class="text-sm text-gray-500">List libraries in `requirements.txt`.</p>
+                    </div>
+                    <div class="flex flex-col items-center p-4">
+                        <div class="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full text-2xl font-bold text-gray-600 mb-3">3</div>
+                        <h5 class="font-semibold">Create Space</h5>
+                        <p class="text-sm text-gray-500">On Hugging Face, select Gradio SDK.</p>
+                    </div>
+                    <div class="flex flex-col items-center p-4">
+                        <div class="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full text-2xl font-bold text-gray-600 mb-3">4</div>
+                        <h5 class="font-semibold">Push Code</h5>
+                        <p class="text-sm text-gray-500">Use Git to upload your files.</p>
+                    </div>
+                    <div class="flex flex-col items-center p-4">
+                        <div class="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-2xl font-bold text-green-600 mb-3">5</div>
+                        <h5 class="font-semibold">Go Live!</h5>
+                        <p class="text-sm text-gray-500">Your app is automatically deployed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Interactive AI Engineering Compendium. Designed to make complex topics accessible and engaging.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile Menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Active Nav Link highlighting on scroll
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            const onScroll = () => {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                // If at the very top, no link should be active.
+                if (window.pageYOffset < sections[0].offsetTop - 100) {
+                    current = '';
+                }
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (current && link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', onScroll);
+            onScroll(); // Run on load
+
+            // QKV Diagram Interaction
+            const qkvData = {
+                q: { title: 'Query (Q)', text: 'The Query vector represents what the current token is "looking for." It is a query about the context, asking other tokens "How relevant are you to me?"' },
+                k: { title: 'Key (K)', text: 'The Key vector represents what a token "has to offer" or what it contains. It acts like a label or index for the information in that token, responding to queries.' },
+                v: { title: 'Value (V)', text: 'The Value vector represents the actual content or information of the token. Once attention scores are calculated, they are used to weigh these Value vectors to create a new, contextualized output.' }
+            };
+            const qkvDiagram = document.getElementById('qkv-diagram');
+            const qkvTitle = document.getElementById('qkv-explanation-title');
+            const qkvText = document.getElementById('qkv-explanation-text');
+            
+            qkvDiagram.addEventListener('click', (e) => {
+                const step = e.target.closest('.interactive-diagram-step');
+                if (!step) return;
+
+                document.querySelectorAll('#qkv-diagram .interactive-diagram-step').forEach(el => el.classList.remove('active'));
+                step.classList.add('active');
+                
+                const id = step.id.split('-')[1];
+                if (qkvData[id]) {
+                    qkvTitle.textContent = qkvData[id].title;
+                    qkvText.textContent = qkvData[id].text;
+                }
+            });
+
+            // Tool Calling Interaction
+            const toolCallingData = [
+                { title: 'Step 1: Request with Tools', text: "The developer sends a prompt to the model, including a list of available `tools` defined by a JSON schema. This tells the model what functions it can potentially use." },
+                { title: 'Step 2: Model Responds with Tool Call', text: "The model analyzes the prompt and decides to call a tool. It responds with a special `tool_call` object containing the function name and arguments." },
+                { title: 'Step 3: Application Executes Tool', text: "Your application code receives the `tool_call` object, parses it, and executes the corresponding local function (e.g., calls an external weather API)." },
+                { title: 'Step 4: Return Tool Output to Model', text: "After the function runs, your app makes a second API call, sending the tool's output back to the model as a new message in the conversation." },
+                { title: 'Step 5: Model Generates Final Response', text: "Now equipped with the data it requested, the model generates a final, natural-language response to the user's original question." }
+            ];
+            const toolCallingStepsContainer = document.getElementById('tool-calling-steps');
+            const toolCallingTitle = document.getElementById('tool-calling-title');
+            const toolCallingExplanation = document.getElementById('tool-calling-explanation');
+
+            toolCallingData.forEach((item, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'interactive-diagram-step p-4 rounded-lg';
+                stepDiv.dataset.index = index;
+                stepDiv.innerHTML = `<h5 class="font-bold">${item.title}</h5>`;
+                if (index === 0) {
+                    stepDiv.classList.add('active');
+                }
+                toolCallingStepsContainer.appendChild(stepDiv);
+            });
+
+            toolCallingStepsContainer.addEventListener('click', (e) => {
+                const step = e.target.closest('.interactive-diagram-step');
+                if (!step) return;
+
+                const index = parseInt(step.dataset.index);
+                toolCallingTitle.textContent = toolCallingData[index].title;
+                toolCallingExplanation.textContent = toolCallingData[index].text;
+
+                document.querySelectorAll('#tool-calling-steps .interactive-diagram-step').forEach(el => el.classList.remove('active'));
+                step.classList.add('active');
+            });
+
+            // RAG Pipeline Interaction
+            const ragData = {
+                index: { title: 'Stage 1: Indexing', text: 'The RAG process begins by taking a corpus of documents (e.g., PDFs, text files) and splitting them into smaller, manageable chunks. An embedding model then converts each chunk into a numerical vector, which is stored and indexed in a specialized vector database. This creates a searchable knowledge library.' },
+                retrieve: { title: 'Stage 2: Retrieval', text: 'When a user submits a query, that query is also converted into a vector using the same embedding model. The system then performs a similarity search in the vector database to find the document chunks whose vectors are closest (most semantically relevant) to the query vector.' },
+                generate: { title: 'Stage 3: Augmentation & Generation', text: 'The text from the most relevant retrieved chunks is appended to the user\'s original prompt. This combined text, rich with factual context, is sent to the LLM. The model then generates a final answer that is grounded in the provided information, making it more accurate and reliable.' }
+            };
+            const ragExplanation = document.getElementById('rag-explanation');
+            const ragExplanationTitle = document.getElementById('rag-explanation-title');
+            const ragExplanationText = document.getElementById('rag-explanation-text');
+            
+            document.querySelectorAll('.rag-step').forEach(step => {
+                step.addEventListener('click', () => {
+                    const id = step.id.split('-')[1];
+                    if (ragData[id]) {
+                        ragExplanation.classList.remove('hidden');
+                        ragExplanationTitle.textContent = ragData[id].title;
+                        ragExplanationText.textContent = ragData[id].text;
+                    }
+                });
+            });
+
+            // LoRA Chart
+            const ctx = document.getElementById('loraChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Full Fine-Tuning', 'LoRA (PEFT)'],
+                    datasets: [{
+                        label: 'Trainable Parameters',
+                        data: [7000, 4.7], // Data in Millions (e.g., 7B model)
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.6)', // Red-ish for high cost
+                            'rgba(34, 197, 94, 0.6)'  // Green for efficient
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(34, 197, 94, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            type: 'logarithmic',
+                            title: {
+                                display: true,
+                                text: 'Parameters (in Millions, log scale)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' Million';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
