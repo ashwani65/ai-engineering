@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Map • AI Engineering Compendium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; color: #4A4A4A; overflow-x: hidden; }
+        .nav-link { transition: all 0.3s ease; position: relative; padding-bottom: 4px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background-color: #4A5568; transition: width 0.3s ease; }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Mind map viewer */
+        #map-viewport { position: relative; overflow: hidden; height: min(75vh, 900px); background: #fff; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        #map-content { position: absolute; top: 0; left: 0; transform-origin: 0 0; user-select: none; cursor: grab; }
+        #map-content.dragging { cursor: grabbing; }
+        #map-image { display: block; max-width: none; pointer-events: none; }
+        .hotspot { position: absolute; transform: translate(-50%, -50%); background: rgba(59,130,246,0.12); color: #1f2937; border: 1px solid rgba(59,130,246,0.5); border-radius: 9999px; padding: 4px 10px; font-size: 12px; line-height: 1; white-space: nowrap; backdrop-filter: blur(2px); }
+        .hotspot:hover { background: rgba(59,130,246,0.2); }
+        .hotspot a { color: inherit; text-decoration: none; }
+        .hotspot.hidden-label { width: 10px; height: 10px; padding: 0; border-radius: 9999px; border-width: 2px; background: #fff; }
+        .toolbar { position: absolute; right: 0.75rem; top: 0.75rem; z-index: 10; display: flex; gap: 0.5rem; }
+        .toolbar button { background: rgba(0,0,0,0.55); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 12px; }
+        .toolbar button:hover { background: rgba(0,0,0,0.7); }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-[#F8F7F4]/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container max-w-6xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800"><a href="./index.html">AI Engineering Compendium</a></h1>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="./foundations.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+                <a href="./building.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+                <a href="./architecting.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
+                <a href="./optimizing.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
+                <a href="./deploying.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+                <a href="./ops.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+                <a href="./safety.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+                <a href="./mindmap.html" class="nav-link font-medium text-gray-800">Mind Map</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="./foundations.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+            <a href="./building.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+            <a href="./architecting.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
+            <a href="./optimizing.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
+            <a href="./deploying.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+            <a href="./ops.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+            <a href="./safety.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+            <a href="./mindmap.html" class="block nav-link font-medium text-gray-800">Mind Map</a>
+        </div>
+    </header>
+
+    <main class="container max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <section class="mb-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Mind Map</h2>
+            <p class="text-gray-600 max-w-3xl">A high-level overview of the AI engineering landscape.</p>
+        </section>
+        <section class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+            <div class="mb-4 flex items-center gap-2">
+                <button id="tab-outline" class="px-3 py-1.5 text-sm rounded border border-gray-300 bg-gray-100">Outline</button>
+                <button id="tab-image" class="px-3 py-1.5 text-sm rounded border border-gray-300">Image</button>
+            </div>
+
+            <!-- Outline (HTML-based) -->
+            <div id="outline-view" class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <input id="outline-search" type="search" placeholder="Filter topics…" class="w-full md:w-1/2 rounded border border-gray-300 px-3 py-2 text-sm" />
+                </div>
+                <div id="outline-tree" class="grid md:grid-cols-2 gap-4">
+                    <details open class="bg-gray-50 rounded p-4">
+                        <summary class="font-semibold text-gray-800 cursor-pointer">Core Concepts</summary>
+                        <ul class="mt-2 list-disc pl-5 text-sm text-gray-700 space-y-1">
+                            <li><a href="./foundations.html">AI Engineering Overview</a></li>
+                            <li><a href="./foundations.html">Understanding Foundation Models</a></li>
+                            <li><a href="./foundations.html">Probabilistic Nature of AI</a></li>
+                        </ul>
+                    </details>
+
+                    <details open class="bg-gray-50 rounded p-4">
+                        <summary class="font-semibold text-gray-800 cursor-pointer">Key Phases & Techniques</summary>
+                        <ul class="mt-2 list-disc pl-5 text-sm text-gray-700 space-y-1">
+                            <li><a href="./building.html">AI Application Planning</a></li>
+                            <li><a href="./building.html">Model Understanding & Fine-tuning</a></li>
+                            <li><a href="./building.html">Sampling Strategies</a></li>
+                            <li><a href="./building.html">Prompt Engineering</a></li>
+                            <li><a href="./architecting.html">Retrieval-Augmented Generation (RAG)</a></li>
+                            <li><a href="./architecting.html">AI Agents</a></li>
+                            <li><a href="./optimizing.html">Advanced Fine-tuning & Data</a></li>
+                            <li><a href="./optimizing.html">Inference Optimization</a></li>
+                        </ul>
+                    </details>
+
+                    <details open class="bg-gray-50 rounded p-4">
+                        <summary class="font-semibold text-gray-800 cursor-pointer">System Aspects</summary>
+                        <ul class="mt-2 list-disc pl-5 text-sm text-gray-700 space-y-1">
+                            <li><a href="./architecting.html">AI Engineering Architecture</a></li>
+                            <li><a href="./ops.html">Monitoring & Observability</a></li>
+                            <li><a href="./ops.html">User Feedback Loop</a></li>
+                            <li><a href="./safety.html">Safety & Governance</a></li>
+                            <li><a href="./deploying.html">Deployment</a></li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Image (zoomable) -->
+            <div id="image-view" class="mt-4 hidden">
+                <div id="map-viewport">
+                    <div class="toolbar">
+                        <button id="zoom-in" aria-label="Zoom in">+</button>
+                        <button id="zoom-out" aria-label="Zoom out">−</button>
+                        <button id="reset" aria-label="Reset view">Reset</button>
+                        <button id="toggle-labels" aria-label="Toggle labels">Labels</button>
+                        <button id="toggle-edit" aria-label="Toggle edit mode">Edit</button>
+                    </div>
+                    <div id="map-content">
+                        <img id="map-image" src="./ai-engineering-mind-map.png" alt="AI Engineering Mind Map" />
+                        <div id="hotspots"></div>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Tip: drag to pan, scroll to zoom, pinch-zoom on mobile. Click labels to navigate.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 text-center text-gray-500">
+            <p>Interactive AI Engineering Compendium. Designed to make complex topics accessible and engaging.</p>
+            <p class="text-sm mt-2"><a class="text-gray-600 hover:text-gray-800 underline" href="https://github.com/ashwani65/ai-engineering" target="_blank" rel="noopener">View the repository on GitHub</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            // Tabs
+            const tabOutline = document.getElementById('tab-outline');
+            const tabImage = document.getElementById('tab-image');
+            const outlineView = document.getElementById('outline-view');
+            const imageView = document.getElementById('image-view');
+            const outlineSearch = document.getElementById('outline-search');
+            const outlineTree = document.getElementById('outline-tree');
+
+            function setTab(tab) {
+                if (tab === 'outline') {
+                    tabOutline.classList.add('bg-gray-100'); tabImage.classList.remove('bg-gray-100');
+                    outlineView.classList.remove('hidden'); imageView.classList.add('hidden');
+                } else {
+                    tabImage.classList.add('bg-gray-100'); tabOutline.classList.remove('bg-gray-100');
+                    imageView.classList.remove('hidden'); outlineView.classList.add('hidden');
+                }
+            }
+            tabOutline.addEventListener('click', () => setTab('outline'));
+            tabImage.addEventListener('click', () => setTab('image'));
+            setTab('outline');
+
+            // Filter outline
+            outlineSearch.addEventListener('input', () => {
+                const q = outlineSearch.value.trim().toLowerCase();
+                outlineTree.querySelectorAll('details').forEach(box => {
+                    let any = false;
+                    box.querySelectorAll('li').forEach(li => {
+                        const match = li.textContent.toLowerCase().includes(q);
+                        li.style.display = match ? '' : 'none';
+                        any = any || match;
+                    });
+                    box.style.display = any || !q ? '' : 'none';
+                    if (q) box.setAttribute('open', 'open');
+                });
+            });
+
+            // Image viewer wires
+            const viewport = document.getElementById('map-viewport');
+            const content = document.getElementById('map-content');
+            const img = document.getElementById('map-image');
+            const hotspotsEl = document.getElementById('hotspots');
+
+            const btnIn = document.getElementById('zoom-in');
+            const btnOut = document.getElementById('zoom-out');
+            const btnReset = document.getElementById('reset');
+            const btnLabels = document.getElementById('toggle-labels');
+            const btnEdit = document.getElementById('toggle-edit');
+
+            let state = { scale: 0.9, x: 0, y: 0, imgW: 0, imgH: 0, labelsHidden: false, edit: false };
+
+            const defaultHotspots = [
+                { id: 'foundations', label: 'Foundations', href: './foundations.html', x: 20, y: 20 },
+                { id: 'building', label: 'Building', href: './building.html', x: 45, y: 18 },
+                { id: 'architecting', label: 'Architecting', href: './architecting.html', x: 70, y: 22 },
+                { id: 'rag', label: 'RAG', href: './architecting.html#rag', x: 62, y: 36 },
+                { id: 'agents', label: 'Agents', href: './architecting.html#agents', x: 78, y: 40 },
+                { id: 'optimizing', label: 'Optimizing', href: './optimizing.html', x: 25, y: 55 },
+                { id: 'deploying', label: 'Deploying', href: './deploying.html', x: 50, y: 60 },
+                { id: 'ops', label: 'Ops', href: './ops.html', x: 75, y: 62 },
+                { id: 'safety', label: 'Safety', href: './safety.html', x: 50, y: 80 }
+            ];
+
+            const STORAGE_KEY = 'mindmap_hotspots_v1';
+            function loadHotspots() {
+                try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultHotspots; } catch { return defaultHotspots; }
+            }
+            function saveHotspots(hs) { localStorage.setItem(STORAGE_KEY, JSON.stringify(hs)); }
+
+            let hotspots = loadHotspots();
+
+            function applyTransform() {
+                content.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+            }
+
+            function clamp() {
+                const vw = viewport.clientWidth, vh = viewport.clientHeight;
+                const minX = vw - state.imgW * state.scale;
+                const minY = vh - state.imgH * state.scale;
+                state.x = Math.min(100, Math.max(minX - 100, state.x));
+                state.y = Math.min(100, Math.max(minY - 100, state.y));
+            }
+
+            function centerContent() {
+                const vw = viewport.clientWidth, vh = viewport.clientHeight;
+                const scaleFit = Math.min(vw / state.imgW, vh / state.imgH);
+                state.scale = Math.min(1.1, scaleFit);
+                state.x = (vw - state.imgW * state.scale) / 2;
+                state.y = (vh - state.imgH * state.scale) / 2;
+                clamp();
+                applyTransform();
+            }
+
+            function zoomAt(cx, cy, delta) {
+                const prevScale = state.scale;
+                const zoomFactor = delta < 0 ? 1.12 : 0.9; // gentle step
+                const nextScale = Math.max(0.4, Math.min(3, state.scale * zoomFactor));
+                if (Math.abs(nextScale - prevScale) < 0.01) return;
+                state.scale = nextScale;
+                // zoom relative to content coordinate space
+                const contentX = (cx - state.x) / prevScale;
+                const contentY = (cy - state.y) / prevScale;
+                state.x = cx - contentX * state.scale;
+                state.y = cy - contentY * state.scale;
+                applyTransform();
+            }
+
+            // Panning
+            let isDragging = false, startX = 0, startY = 0, originX = 0, originY = 0;
+            content.addEventListener('mousedown', (e) => {
+                isDragging = true; startX = e.clientX; startY = e.clientY; originX = state.x; originY = state.y; content.classList.add('dragging');
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                state.x = originX + (e.clientX - startX);
+                state.y = originY + (e.clientY - startY);
+                clamp();
+                applyTransform();
+            });
+            window.addEventListener('mouseup', () => { isDragging = false; content.classList.remove('dragging'); });
+
+            // Touch: pan and pinch
+            let touchMode = null; let lastDist = 0; let center = { x: 0, y: 0 };
+            content.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) { touchMode = 'pan'; startX = e.touches[0].clientX; startY = e.touches[0].clientY; originX = state.x; originY = state.y; }
+                if (e.touches.length === 2) {
+                    touchMode = 'pinch';
+                    const [t1, t2] = e.touches; lastDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+                    center = { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+                }
+            }, { passive: true });
+            content.addEventListener('touchmove', (e) => {
+                if (touchMode === 'pan' && e.touches.length === 1) {
+                    state.x = originX + (e.touches[0].clientX - startX);
+                    state.y = originY + (e.touches[0].clientY - startY);
+                    applyTransform();
+                }
+                if (touchMode === 'pinch' && e.touches.length === 2) {
+                    const [t1, t2] = e.touches; const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+                    zoomAt(center.x, center.y, dist > lastDist ? -1 : 1); lastDist = dist;
+                }
+            }, { passive: true });
+            content.addEventListener('touchend', () => { touchMode = null; });
+
+            // Wheel zoom
+            // Debounced wheel zoom for smoother interaction
+            let wheelTimeout = null;
+            viewport.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = viewport.getBoundingClientRect();
+                const cx = e.clientX - rect.left; const cy = e.clientY - rect.top;
+                if (wheelTimeout) cancelAnimationFrame(wheelTimeout);
+                wheelTimeout = requestAnimationFrame(() => { zoomAt(cx, cy, e.deltaY); });
+            }, { passive: false });
+
+            // Toolbar actions
+            btnIn.addEventListener('click', () => { const r = viewport.getBoundingClientRect(); zoomAt(r.width/2, r.height/2, -1); });
+            btnOut.addEventListener('click', () => { const r = viewport.getBoundingClientRect(); zoomAt(r.width/2, r.height/2, 1); });
+            btnReset.addEventListener('click', () => { centerContent(); });
+            btnLabels.addEventListener('click', () => { state.labelsHidden = !state.labelsHidden; document.querySelectorAll('.hotspot').forEach(h => h.classList.toggle('hidden-label', state.labelsHidden)); });
+            btnEdit.addEventListener('click', () => { state.edit = !state.edit; btnEdit.textContent = state.edit ? 'Done' : 'Edit'; });
+
+            // Hotspots
+            function renderHotspots() {
+                hotspotsEl.innerHTML = '';
+                hotspots.forEach((h, idx) => {
+                    const a = document.createElement('a');
+                    a.href = h.href; a.target = '_self'; a.className = 'hotspot'; a.textContent = h.label;
+                    a.dataset.index = String(idx);
+                    hotspotsEl.appendChild(a);
+                });
+                positionHotspots();
+            }
+
+            function positionHotspots() {
+                const nodes = hotspotsEl.querySelectorAll('.hotspot');
+                nodes.forEach((node) => {
+                    const idx = Number(node.dataset.index);
+                    const hs = hotspots[idx];
+                    const px = (hs.x / 100) * state.imgW; const py = (hs.y / 100) * state.imgH;
+                    node.style.left = `${px}px`; node.style.top = `${py}px`;
+                    node.classList.toggle('hidden-label', state.labelsHidden);
+                });
+            }
+
+            function enableHotspotDragging() {
+                hotspotsEl.addEventListener('mousedown', (e) => {
+                    const target = e.target.closest('.hotspot');
+                    if (!target || !state.edit) return;
+                    e.stopPropagation();
+                    const idx = Number(target.dataset.index);
+                    const startClient = { x: e.clientX, y: e.clientY };
+                    const startPos = { x: hotspots[idx].x, y: hotspots[idx].y };
+                    function onMove(me) {
+                        const dx = (me.clientX - startClient.x) / (state.imgW * state.scale) * 100;
+                        const dy = (me.clientY - startClient.y) / (state.imgH * state.scale) * 100;
+                        hotspots[idx].x = Math.max(0, Math.min(100, startPos.x + dx));
+                        hotspots[idx].y = Math.max(0, Math.min(100, startPos.y + dy));
+                        positionHotspots();
+                    }
+                    function onUp() { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); saveHotspots(hotspots); }
+                    window.addEventListener('mousemove', onMove);
+                    window.addEventListener('mouseup', onUp);
+                });
+            }
+
+            img.addEventListener('load', () => {
+                state.imgW = img.naturalWidth; state.imgH = img.naturalHeight;
+                // Size the content to the image intrinsic size
+                content.style.width = `${state.imgW}px`; content.style.height = `${state.imgH}px`;
+                centerContent();
+                renderHotspots();
+                enableHotspotDragging();
+                window.addEventListener('resize', centerContent);
+            });
+        });
+    </script>
+</body>
+</html>
+
+

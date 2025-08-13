@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimizing • AI Engineering Compendium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Advanced customization and evaluation: LoRA/QLoRA, preference optimization, latency and cost techniques.">
+    <link rel="canonical" href="https://ashwani65.github.io/ai-engineering/optimizing.html">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; color: #4A4A4A; overflow-x: hidden; }
+        .nav-link { transition: all 0.3s ease; position: relative; padding-bottom: 4px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background-color: #4A5568; transition: width 0.3s ease; }
+        .nav-link:hover::after { width: 100%; }
+        .chart-container { position: relative; width: 100%; max-width: 700px; margin-left: auto; margin-right: auto; height: 300px; max-height: 50vh; }
+        @media (max-width: 768px) { .chart-container { height: 220px; } }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-[#F8F7F4]/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container max-w-6xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800"><a href="./index.html">AI Engineering Compendium</a></h1>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="./foundations.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+                <a href="./building.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+                <a href="./architecting.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
+                <a href="./optimizing.html" class="nav-link font-medium text-gray-800">Optimizing</a>
+                <a href="./deploying.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+                <a href="./ops.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+                <a href="./safety.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+                <a href="./mindmap.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Mind Map</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="./foundations.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+            <a href="./building.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+            <a href="./architecting.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Architecting</a>
+            <a href="./optimizing.html" class="block nav-link font-medium text-gray-800">Optimizing</a>
+            <a href="./deploying.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+            <a href="./ops.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+            <a href="./safety.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+            <a href="./mindmap.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Mind Map</a>
+        </div>
+    </header>
+
+    <main class="container max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <section class="mb-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Part IV: Advanced Customization & Evaluation</h2>
+            <p class="text-gray-600 max-w-3xl">LoRA vs full fine-tuning, preference optimization, and latency/cost techniques.</p>
+        </section>
+
+        <section class="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-8">
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Fine-Tuning Efficiency</h4>
+                <div class="chart-container"><canvas id="loraChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4">Evaluating Agent Performance</h4>
+                <ul class="space-y-3 text-gray-600">
+                    <li><strong class="text-gray-700">Task Performance:</strong> Success rate, accuracy.</li>
+                    <li><strong class="text-gray-700">Efficiency:</strong> Cost and latency.</li>
+                    <li><strong class="text-gray-700">Trajectory:</strong> Tool use precision and recall.</li>
+                    <li><strong class="text-gray-700">Safety & Ethics:</strong> Bias and harm checks.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="grid md:grid-cols-2 gap-8 md:gap-12 mb-8">
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Preference Optimization</h4>
+                <ul class="space-y-3 text-gray-600">
+                    <li><strong class="text-gray-700">RLHF:</strong> Reward-model based, powerful but complex.</li>
+                    <li><strong class="text-gray-700">DPO/ORPO:</strong> Train directly from preference pairs.</li>
+                    <li><strong class="text-gray-700">Constitutional/Self-Play:</strong> AI feedback reduces human labeling.</li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Latency & Cost</h4>
+                <ul class="space-y-3 text-gray-600">
+                    <li><strong class="text-gray-700">Speculative Decoding:</strong> Draft-and-verify for speedups.</li>
+                    <li><strong class="text-gray-700">Caching:</strong> Reuse embeddings, retrieval, and prompt prefixes.</li>
+                    <li><strong class="text-gray-700">Distillation:</strong> Smaller students for inference.</li>
+                </ul>
+                <div class="chart-container mt-6"><canvas id="quantChart"></canvas></div>
+            </div>
+        </section>
+
+        <section class="grid md:grid-cols-2 gap-8 md:gap-12">
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Advanced Fine-Tuning & Data</h4>
+                <ul class="space-y-3 text-gray-600">
+                    <li><strong class="text-gray-700">PEFT:</strong> LoRA, QLoRA, adapters.</li>
+                    <li><strong class="text-gray-700">Model Merging:</strong> Blend specialists carefully.</li>
+                    <li><strong class="text-gray-700">Curation:</strong> High-quality instruction/preference data.</li>
+                    <li><strong class="text-gray-700">Synthesis:</strong> Guardrailed generation + review.</li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">Inference Optimization</h4>
+                <ul class="space-y-3 text-gray-600">
+                    <li><strong class="text-gray-700">Metrics:</strong> p50/p95 latency, throughput, cost.</li>
+                    <li><strong class="text-gray-700">Compression:</strong> Quantization, pruning, KV cache reuse.</li>
+                    <li><strong class="text-gray-700">Service:</strong> Batching, streaming, autoscaling.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 text-center text-gray-500">
+            <p>Interactive AI Engineering Compendium. Designed to make complex topics accessible and engaging.</p>
+            <p class="text-sm mt-2"><a class="text-gray-600 hover:text-gray-800 underline" href="https://github.com/ashwani65/ai-engineering" target="_blank" rel="noopener">View the repository on GitHub</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            const loraCtx = document.getElementById('loraChart').getContext('2d');
+            new Chart(loraCtx, {
+                type: 'bar',
+                data: { labels: ['Full FT', 'LoRA'], datasets: [{ label: 'Trainable Params (M)', data: [7000, 5], backgroundColor: ['rgba(239,68,68,0.6)','rgba(34,197,94,0.6)'], borderColor: ['rgba(239,68,68,1)','rgba(34,197,94,1)'], borderWidth: 1 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, type: 'logarithmic', title: { display: true, text: 'Millions (log)' } } }, plugins: { legend: { display: false } } }
+            });
+
+            const quantCanvas = document.getElementById('quantChart');
+            if (quantCanvas) {
+                const quantCtx = quantCanvas.getContext('2d');
+                new Chart(quantCtx, {
+                    type: 'bar', data: { labels: ['FP16','INT8','INT4'], datasets: [{ label: 'Relative Latency (↓)', data: [1.0,0.65,0.45], backgroundColor: 'rgba(59,130,246,0.6)', borderColor: 'rgba(59,130,246,1)', borderWidth: 1 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'Relative Latency' } } }, plugins: { legend: { display: false } } }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+

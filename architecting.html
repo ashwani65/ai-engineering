@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecting • AI Engineering Compendium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="RAG pipeline, best practices, and AI agent patterns.">
+    <link rel="canonical" href="https://ashwani65.github.io/ai-engineering/architecting.html">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; color: #4A4A4A; overflow-x: hidden; }
+        .nav-link { transition: all 0.3s ease; position: relative; padding-bottom: 4px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background-color: #4A5568; transition: width 0.3s ease; }
+        .nav-link:hover::after { width: 100%; }
+        .rag-step { transition: all 0.3s ease; }
+        .rag-step:hover { background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-[#F8F7F4]/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container max-w-6xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800"><a href="./index.html">AI Engineering Compendium</a></h1>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="./foundations.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+                <a href="./building.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+                <a href="./architecting.html" class="nav-link font-medium text-gray-800">Architecting</a>
+                <a href="./optimizing.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
+                <a href="./deploying.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+                <a href="./ops.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+                <a href="./safety.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+                <a href="./mindmap.html" class="nav-link font-medium text-gray-600 hover:text-gray-900">Mind Map</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="./foundations.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Foundations</a>
+            <a href="./building.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Building</a>
+            <a href="./architecting.html" class="block nav-link font-medium text-gray-800">Architecting</a>
+            <a href="./optimizing.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Optimizing</a>
+            <a href="./deploying.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Deploying</a>
+            <a href="./ops.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Ops</a>
+            <a href="./safety.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Safety</a>
+            <a href="./mindmap.html" class="block nav-link font-medium text-gray-600 hover:text-gray-900">Mind Map</a>
+        </div>
+    </header>
+
+    <main class="container max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <section class="mb-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Part III: Engineering Intelligent Systems</h2>
+            <p class="text-gray-600 max-w-3xl">RAG pipeline, best practices, and agent architectures.</p>
+        </section>
+
+        <section class="bg-white p-6 md:p-8 rounded-lg shadow-md mb-8">
+            <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">The RAG Pipeline</h4>
+            <p class="text-center text-gray-600 mb-8">Explore the main stages of RAG.</p>
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8 text-center">
+                <div id="rag-index" class="rag-step p-4 md:p-6 rounded-lg bg-gray-50 cursor-pointer">
+                    <div class="text-3xl mb-2">🗂️</div>
+                    <h5 class="font-bold text-lg">1. Indexing</h5>
+                    <p class="text-sm">Chunking, embeddings, and vector DB indexing.</p>
+                </div>
+                <div id="rag-retrieve" class="rag-step p-4 md:p-6 rounded-lg bg-gray-50 cursor-pointer">
+                    <div class="text-3xl mb-2">🔍</div>
+                    <h5 class="font-bold text-lg">2. Retrieval</h5>
+                    <p class="text-sm">Similarity search finds relevant chunks.</p>
+                </div>
+                <div id="rag-generate" class="rag-step p-4 md:p-6 rounded-lg bg-gray-50 cursor-pointer">
+                    <div class="text-3xl mb-2">✍️</div>
+                    <h5 class="font-bold text-lg">3. Generation</h5>
+                    <p class="text-sm">Augment the prompt and generate grounded answers.</p>
+                </div>
+            </div>
+            <div id="rag-explanation" class="mt-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-400 hidden">
+                <h5 id="rag-explanation-title" class="font-bold text-xl mb-2"></h5>
+                <p id="rag-explanation-text"></p>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 md:p-8 rounded-lg shadow-md mb-8">
+            <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">RAG Best Practices</h4>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Chunking</h5><p class="text-sm text-gray-600">Semantic or heading-aware chunking with modest overlap.</p></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Hybrid Search</h5><p class="text-sm text-gray-600">Dense vectors + BM25 for exact terms.</p></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Reranking</h5><p class="text-sm text-gray-600">Cross-encoder rerank top-K results.</p></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Filters</h5><p class="text-sm text-gray-600">Use metadata to narrow scope.</p></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Citations</h5><p class="text-sm text-gray-600">Return source URLs/IDs with spans.</p></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Evaluation</h5><p class="text-sm text-gray-600">Measure precision/recall and faithfulness.</p></div>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+            <h4 class="text-2xl font-bold text-gray-800 mb-4 text-center">AI Agents</h4>
+            <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Components</h5><ul class="list-disc pl-5 text-sm text-gray-600 space-y-1"><li>Planner</li><li>Tools & Environment</li><li>Memory & State</li></ul></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Planning & Tool Use</h5><ul class="list-disc pl-5 text-sm text-gray-600 space-y-1"><li>Decompose tasks</li><li>Validate IO</li><li>Fallbacks</li></ul></div>
+                <div class="p-4 rounded-lg bg-gray-50"><h5 class="font-semibold mb-2">Memory Systems</h5><ul class="list-disc pl-5 text-sm text-gray-600 space-y-1"><li>Short-term context</li><li>Long-term vector store</li><li>Episodic artifacts</li></ul></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 text-center text-gray-500">
+            <p>Interactive AI Engineering Compendium. Designed to make complex topics accessible and engaging.</p>
+            <p class="text-sm mt-2"><a class="text-gray-600 hover:text-gray-800 underline" href="https://github.com/ashwani65/ai-engineering" target="_blank" rel="noopener">View the repository on GitHub</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            const ragData = {
+                index: { title: 'Stage 1: Indexing', text: 'Split documents, embed chunks, and index in a vector database.' },
+                retrieve: { title: 'Stage 2: Retrieval', text: 'Embed the query and search for the most relevant chunks.' },
+                generate: { title: 'Stage 3: Generation', text: 'Augment the prompt with retrieved text and generate an answer.' }
+            };
+            const ragExplanation = document.getElementById('rag-explanation');
+            const ragExplanationTitle = document.getElementById('rag-explanation-title');
+            const ragExplanationText = document.getElementById('rag-explanation-text');
+            document.querySelectorAll('.rag-step').forEach(step => {
+                step.addEventListener('click', () => {
+                    const id = step.id.split('-')[1];
+                    if (ragData[id]) {
+                        ragExplanation.classList.remove('hidden');
+                        ragExplanationTitle.textContent = ragData[id].title;
+                        ragExplanationText.textContent = ragData[id].text;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
